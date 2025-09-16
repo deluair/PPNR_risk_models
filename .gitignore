@@ -1,0 +1,117 @@
+# PPNR Risk Models - Git Ignore File
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data files (sensitive)
+data/raw/*.csv
+data/processed/*.csv
+data/scenarios/*.json
+*.db
+*.sqlite
+*.sqlite3
+
+# Model artifacts
+models/trained/
+models/checkpoints/
+*.pkl
+*.joblib
+*.h5
+*.model
+
+# Logs
+*.log
+logs/
+test_results.log
+
+# Reports and outputs
+reports/*.pdf
+reports/*.html
+reports/*.xlsx
+outputs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Configuration files with sensitive data
+config/production.yaml
+config/secrets.yaml

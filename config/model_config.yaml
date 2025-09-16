@@ -1,0 +1,124 @@
+# PPNR Risk Models Configuration
+
+# Data Sources
+data_sources:
+  fred_api_key: "YOUR_FRED_API_KEY"  # Federal Reserve Economic Data
+  bloomberg_api: "YOUR_BLOOMBERG_API"  # Bloomberg Terminal API
+  internal_data_path: "data/raw/"
+  
+# Model Parameters
+models:
+  net_interest_income:
+    lookback_period: 60  # months
+    forecast_horizon: 36  # months
+    interest_rate_scenarios: ["base", "rising", "falling", "shock"]
+    balance_sheet_components:
+      - loans_commercial
+      - loans_consumer
+      - securities
+      - deposits
+      - borrowings
+    
+  fee_income:
+    components:
+      - service_charges
+      - investment_banking
+      - trading_fees
+      - card_processing
+      - trust_services
+    seasonality_adjustment: true
+    
+  trading_revenue:
+    risk_factors:
+      - equity_volatility
+      - fx_volatility
+      - credit_spreads
+      - commodity_prices
+    var_confidence_level: 0.99
+    var_holding_period: 1  # days
+
+# Stress Testing
+stress_testing:
+  scenarios:
+    baseline:
+      gdp_growth: [2.1, 2.3, 2.5]  # 3-year forecast
+      unemployment: [3.8, 3.9, 4.0]
+      fed_funds_rate: [5.25, 5.50, 5.75]
+      
+    adverse:
+      gdp_growth: [-1.5, -2.0, 1.0]
+      unemployment: [6.5, 8.0, 7.5]
+      fed_funds_rate: [3.0, 2.0, 2.5]
+      
+    severely_adverse:
+      gdp_growth: [-4.0, -3.5, 0.5]
+      unemployment: [10.0, 12.5, 11.0]
+      fed_funds_rate: [0.5, 0.25, 1.0]
+      
+  monte_carlo:
+    simulations: 10000
+    confidence_intervals: [0.05, 0.95]
+
+# Risk Factors
+risk_factors:
+  credit_risk:
+    pd_models: ["logistic", "survival"]
+    lgd_models: ["beta", "fractional_logit"]
+    ead_models: ["linear", "tobit"]
+    
+  market_risk:
+    var_models: ["historical", "parametric", "monte_carlo"]
+    correlation_models: ["dcc_garch", "ewma"]
+    
+  operational_risk:
+    frequency_models: ["poisson", "negative_binomial"]
+    severity_models: ["lognormal", "weibull"]
+
+# Regulatory Requirements
+regulatory:
+  ccar:
+    capital_ratios:
+      - tier1_common
+      - tier1_leverage
+      - total_capital
+    minimum_thresholds:
+      tier1_common: 0.045  # 4.5%
+      tier1_leverage: 0.04  # 4.0%
+      total_capital: 0.08   # 8.0%
+      
+  dfast:
+    bank_size_threshold: 100_000_000_000  # $100B assets
+    stress_test_frequency: "annual"
+    
+  basel_iii:
+    lcr_minimum: 1.0  # 100%
+    nsfr_minimum: 1.0  # 100%
+
+# Model Validation
+validation:
+  backtesting:
+    window_size: 252  # trading days
+    significance_level: 0.05
+    
+  performance_metrics:
+    - mae  # Mean Absolute Error
+    - rmse  # Root Mean Square Error
+    - mape  # Mean Absolute Percentage Error
+    - r_squared
+    
+  champion_challenger:
+    enabled: true
+    challenger_models: 2
+    evaluation_period: 90  # days
+
+# Output Settings
+output:
+  reports:
+    format: ["pdf", "html", "excel"]
+    frequency: "quarterly"
+    
+  dashboards:
+    refresh_rate: "daily"
+    alert_thresholds:
+      revenue_variance: 0.10  # 10%
+      stress_test_failure: true
