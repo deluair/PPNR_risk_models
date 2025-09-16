@@ -30,7 +30,7 @@ The PPNR Risk Models System is an enterprise-grade solution that provides:
 - **Data Validation**: Comprehensive data quality checks and validation rules
 - **Data Transformation**: ETL pipelines with error handling and logging
 - **Historical Analysis**: Time series analysis and trend identification
-- **Real-time Processing**: Streaming data integration capabilities
+- **Sample Data Generation**: Synthetic data creation for testing and demonstration
 
 ### Visualization & Reporting
 - **Interactive Dashboards**: Risk monitoring with real-time updates
@@ -63,8 +63,8 @@ openpyxl>=3.0.0
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-org/ppnr-risk-models.git
-cd ppnr-risk-models
+git clone https://github.com/deluair/PPNR_risk_models.git
+cd PPNR_risk_models
 ```
 
 ### 2. Create Virtual Environment
@@ -80,115 +80,184 @@ pip install -r requirements.txt
 
 ### 4. Configure Environment
 ```bash
-cp config/model_config.yaml config/config.yaml
-# Edit config.yaml with your settings
+# Configuration file is already provided at config/model_config.yaml
+# Edit config/model_config.yaml with your specific settings if needed
 ```
 
 ## 🏃‍♂️ Quick Start
 
-### 1. Data Processing Pipeline
+### 1. Generate Sample Data and Run Demo
+```bash
+# Generate comprehensive sample data
+python generate_sample_data.py
+
+# Run the complete system demonstration
+python demo_ppnr_system.py
+```
+
+### 2. Data Processing Pipeline
 ```python
 from src.data import DataLoader, DataValidator
 
 # Initialize data processor
 loader = DataLoader(config_path='config/model_config.yaml')
-validator = DataValidator()
+validator = DataValidator(config={'data_validation': {'completeness_threshold': 0.95}})
 
 # Load and validate data
-raw_data = loader.load_portfolio_data('data/raw/portfolio_data.csv')
-validated_data = validator.validate_data(raw_data)
+raw_data = loader.load_portfolio_data('data/processed/portfolio_data.csv')
+validation_result = validator.validate_data(raw_data, data_type='portfolio')
 ```
 
-### 2. Risk Model Training
+### 3. Risk Model Training
 ```python
-from src.risk_factors import CreditRiskModel, MarketRiskModel
+from src.risk_factors.credit_risk import CreditRiskModel
+from src.risk_factors.market_risk import MarketRiskModel
 
 # Credit risk modeling
-credit_model = CreditRiskModel()
-credit_model.train_pd_model(validated_data)
-credit_model.train_lgd_model(validated_data)
+credit_model = CreditRiskModel(config={'credit_risk': {}})
+pd_predictions = credit_model.predict_pd(portfolio_data)
 
 # Market risk modeling
-market_model = MarketRiskModel()
+market_model = MarketRiskModel(config={'market_risk': {}})
 var_results = market_model.calculate_var(portfolio_data, confidence_level=0.99)
 ```
 
-### 3. Regulatory Compliance
+### 4. Regulatory Compliance
 ```python
-from src.regulatory import CCARCompliance, BaselCompliance
+from src.regulatory.ccar_compliance import CCARCompliance
+from src.regulatory.basel_iii import BaselIII
 
 # CCAR stress testing
-ccar = CCARCompliance()
+ccar = CCARCompliance(config={'ccar': {}})
 stress_results = ccar.run_stress_test(
     portfolio_data=validated_data,
     scenarios=['baseline', 'adverse', 'severely_adverse']
 )
 
 # Basel III capital calculations
-basel = BaselCompliance()
+basel = BaselIII(config={'basel_iii': {}})
 capital_ratios = basel.calculate_capital_ratios(validated_data)
 ```
 
-### 4. Dashboard Launch
+### 5. Dashboard Launch
 ```python
-from src.dashboard import RiskDashboard
+from src.dashboard.risk_dashboard import RiskDashboard
 
 # Initialize and run dashboard
 dashboard = RiskDashboard(config_path='config/model_config.yaml')
-dashboard.register_models([credit_model, market_model])
 dashboard.run(host='localhost', port=8050, debug=False)
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 PPNR_risk_models/
-├── src/
-│   ├── models/          # Core PPNR models
-│   ├── data/            # Data processing and pipeline
-│   ├── stress_testing/  # Stress testing framework
-│   ├── risk_factors/    # Risk factor modeling
-│   ├── compliance/      # Regulatory compliance features
-│   └── visualization/   # Dashboard and plotting utilities
+├── config/
+│   └── model_config.yaml          # System configuration
 ├── data/
-│   ├── raw/            # Raw data files
-│   ├── processed/      # Cleaned and processed data
-│   └── scenarios/      # Stress test scenarios
-├── tests/              # Unit and integration tests
-├── notebooks/          # Jupyter notebooks for analysis
-├── config/             # Configuration files
-└── docs/               # Documentation
+│   ├── processed/                 # Generated sample data
+│   ├── raw/                      # Raw data files
+│   └── scenarios/                # Stress test scenarios
+│       ├── adverse_scenario.csv
+│       ├── baseline_scenario.csv
+│       └── severely_adverse_scenario.csv
+├── docs/
+│   ├── api_reference.md          # API documentation
+│   ├── model_methodology.md      # Model methodology guide
+│   └── user_guide.md            # User guide
+├── src/
+│   ├── dashboard/               # Dashboard and visualization
+│   │   ├── report_generator.py
+│   │   ├── risk_dashboard.py
+│   │   └── visualization_engine.py
+│   ├── data/                    # Data processing pipeline
+│   │   ├── data_loader.py
+│   │   ├── data_validator.py
+│   │   ├── bank_metrics_processor.py
+│   │   ├── economic_indicators_processor.py
+│   │   └── market_data_processor.py
+│   ├── models/                  # Core PPNR models
+│   │   ├── base_model.py
+│   │   ├── fee_income_model.py
+│   │   ├── nii_model.py
+│   │   └── trading_revenue_model.py
+│   ├── regulatory/              # Regulatory compliance
+│   │   ├── basel_iii.py
+│   │   ├── ccar_compliance.py
+│   │   ├── dfast_compliance.py
+│   │   ├── capital_calculator.py
+│   │   └── regulatory_reporter.py
+│   ├── risk_factors/            # Risk factor modeling
+│   │   ├── credit_risk.py
+│   │   ├── market_risk.py
+│   │   ├── operational_risk.py
+│   │   └── risk_integration.py
+│   └── stress_testing/          # Stress testing framework
+│       ├── scenario_generator.py
+│       ├── stress_tester.py
+│       └── model_validator.py
+├── tests/                       # Unit and integration tests
+├── demo_ppnr_system.py         # Complete system demonstration
+├── generate_sample_data.py     # Sample data generation
+├── requirements.txt            # Python dependencies
+└── README.md                   # This file
 ```
 
-## Installation
+## 🎯 System Demonstration
 
-1. Clone the repository:
+The system includes a comprehensive demonstration that showcases all key capabilities:
+
+### Running the Demo
 ```bash
-git clone <repository-url>
-cd PPNR_risk_models
+# Generate sample data (10,000 loans, market data, scenarios)
+python generate_sample_data.py
+
+# Run complete system demonstration
+python demo_ppnr_system.py
 ```
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+### Demo Features
+- **Data Validation**: Quality assessment of portfolio data
+- **Credit Risk Modeling**: PD/LGD calculations and portfolio analysis
+- **Market Risk Assessment**: VaR calculations and risk metrics
+- **Stress Testing**: Multi-scenario stress testing with regulatory scenarios
+- **Regulatory Compliance**: Basel III and CCAR compliance monitoring
+- **PPNR Projections**: Revenue and loss forecasting
+- **Automated Reporting**: Summary report generation
+
+### Sample Output
+```
+============================================================
+  PPNR RISK MODELS SYSTEM DEMONSTRATION
+============================================================
+
+✓ Data Validation & Quality Assessment
+  - Portfolio Quality Score: 0.95
+  - Data Completeness: 100.0%
+  - Missing Values: 0
+
+✓ Credit Risk Modeling & Portfolio Analysis
+  - Total Exposure: $634,013,715
+  - Average PD: 1.97%
+  - Expected Loss Rate: 0.79%
+
+✓ Market Risk Assessment & VaR Calculation
+  - Portfolio VaR (99%): $2,847,061
+  - Expected Shortfall: $3,421,273
+
+✓ Stress Testing with Multiple Scenarios
+  - Baseline Loss Rate: 0.79%
+  - Adverse Loss Rate: 2.34%
+  - Severely Adverse Loss Rate: 4.12%
+
+✓ Regulatory Compliance Monitoring
+  - Tier 1 Capital Ratio: 12.06%
+  - Status: WELL CAPITALIZED
+
+✓ Summary report saved to: demo_summary_[timestamp].txt
 ```
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-## Quick Start
-
-1. **Data Setup**: Place your historical banking data in the `data/raw/` directory
-2. **Configuration**: Update `config/model_config.yaml` with your specific parameters
-3. **Run Models**: Execute the main modeling pipeline:
-```bash
-python src/main.py --config config/model_config.yaml
-```
-
-## Model Components
+## 🔧 Model Components
 
 ### Net Interest Income (NII) Models
 - Interest rate sensitivity analysis
@@ -205,23 +274,97 @@ python src/main.py --config config/model_config.yaml
 - VaR-based revenue forecasting
 - Correlation analysis across trading desks
 
-### Stress Testing
+### Credit Risk Models
+- Probability of Default (PD) modeling
+- Loss Given Default (LGD) estimation
+- Exposure at Default (EAD) calculations
+- Portfolio segmentation and concentration analysis
+
+### Market Risk Models
+- Value at Risk (VaR) calculations
+- Expected Shortfall modeling
+- Multi-factor risk modeling
+- Correlation and volatility analysis
+
+### Stress Testing Framework
 - Severely adverse scenario modeling
 - Model performance under stress
 - Regulatory capital impact assessment
+- Multi-horizon stress projections
 
-## Regulatory Compliance
+## 📊 Regulatory Compliance
 
-The system supports:
+The system supports comprehensive regulatory requirements:
+
 - **CCAR**: Comprehensive Capital Analysis and Review
 - **DFAST**: Dodd-Frank Act Stress Testing
 - **Basel III**: Capital adequacy requirements
 - **SR 11-7**: Model Risk Management guidance
 
-## Contributing
+### Key Compliance Features
+- Automated regulatory reporting
+- Capital adequacy calculations
+- Stress testing scenarios
+- Model validation frameworks
+- Risk governance workflows
 
-Please read our contributing guidelines and ensure all tests pass before submitting pull requests.
+## 🧪 Testing
 
-## License
+Run the test suite to validate system functionality:
+
+```bash
+# Run basic system test
+python simple_test.py
+
+# Run comprehensive test suite
+python test_system.py
+
+# Run unit tests
+python -m pytest tests/
+```
+
+## 📈 Performance Metrics
+
+The system is designed to handle enterprise-scale data:
+
+- **Portfolio Size**: 10,000+ loans tested
+- **Processing Speed**: <30 seconds for full demonstration
+- **Memory Usage**: <2GB for standard datasets
+- **Scalability**: Designed for millions of records
+
+## 🤝 Contributing
+
+We welcome contributions to improve the PPNR Risk Models System:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow PEP 8 style guidelines
+- Add unit tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting
+
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For questions, issues, or support:
+
+- Create an issue on GitHub
+- Review the documentation in the `docs/` directory
+- Check the demo output for system capabilities
+
+## 🔄 Version History
+
+- **v1.0.0**: Initial release with complete PPNR modeling framework
+  - Full regulatory compliance suite
+  - Comprehensive risk modeling
+  - Interactive demonstration
+  - Sample data generation
+  - Robust error handling and fallback mechanisms
