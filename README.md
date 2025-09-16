@@ -84,6 +84,40 @@ pip install -r requirements.txt
 # Edit config/model_config.yaml with your specific settings if needed
 ```
 
+## 📡 Using Real Data Sources
+
+This project supports real data ingestion with graceful fallback to synthetic data when real sources are unavailable. Real sources are used in the demo and throughout the library where possible.
+
+- Market Data: Yahoo Finance via the yfinance library (no API key required).
+- Economic Indicators: FRED API (Federal Reserve Bank of St. Louis) via fredapi.
+- Bank Metrics: FDIC BankFind public API (no API key required).
+
+Quick setup for real data:
+1) Copy environment template and set your FRED API key
+```bash
+cp .env.example .env  # On Windows: copy .env.example .env
+# Edit .env and set:
+# FRED_API_KEY=your_fred_api_key_here
+```
+2) Ensure dependencies are installed (covered by requirements.txt)
+```bash
+pip install -r requirements.txt
+```
+3) Run the demo normally
+```bash
+python demo_ppnr_system.py
+```
+
+Behavior and fallbacks:
+- If the FRED API key is missing or fredapi is not installed, the system logs a warning and uses synthetic macro data.
+- If Yahoo Finance is unreachable, market data falls back to synthetic.
+- If FDIC API calls fail or return incomplete data, synthetic bank metrics are generated for demonstration.
+
+Configuration notes:
+- Environment: FRED key is read from the FRED_API_KEY variable (see .env.example).
+- Data configuration: see config/data_config.yaml for provider settings and mappings.
+- Detailed guide: see README_REAL_DATA.md for step-by-step instructions and troubleshooting.
+
 ## 🏃‍♂️ Quick Start
 
 ### 1. Generate Sample Data and Run Demo
